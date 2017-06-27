@@ -1,0 +1,22 @@
+{
+    "name": "svgSanitizer",
+    "lowCaseName": "svgsanitizer",
+    "description": "A MODX wrapper for SVG Sanitizer, a PHP tool that cleans possibly malicious code fragments from SVG files. For more info, visit https://github.com/darylldoyle/svg-sanitizer.",
+    "author": "Hugo Peek",
+    "version": "0.1.0",
+
+    "package": {
+        "elements": {
+            "snippets": [
+                {
+                    "name": "svgSanitize",
+                    "description": "This snippet cleans a single SVG file and returns the output inline."
+                }
+            ],
+
+            "categories": []
+        },
+
+        "systemSettings": []
+    }
+}
