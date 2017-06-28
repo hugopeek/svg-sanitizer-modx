@@ -14,11 +14,11 @@ $file = $modx->getOption('file', $scriptProperties, '');
 $minify = $modx->getOption('minify', $scriptProperties, 1);
 $removeRemote = $modx->getOption('removeRemote', $scriptProperties, 0);
 
-// Option to remove the <?xml> tag from the header
-$stripHeader = $modx->getOption('stripHeader', $scriptProperties, 0);
+// Indicate if the SVG will be parsed inline or not
+$svgInline = $modx->getOption('inline', $scriptProperties, 1);
 
-// Output as SVG symbol instead of stand-alone SVG (for nested use in a parent SVG)
-$toSymbol = $modx->getOption('toSymbol', $scriptProperties, 0);
+// Output as SVG symbol instead, for nested use in a parent SVG
+$svgToSymbol = $modx->getOption('toSymbol', $scriptProperties, 0);
 
 // Setup svgSanitize
 if (!class_exists('\enshrined\svgSanitize\Sanitizer')) {
@@ -37,7 +37,7 @@ if ($minify) {
 if ($removeRemote) {
     $sanitizer->removeRemoteReferences(true);
 }
-if ($stripHeader) {
+if ($svgInline) {
     $sanitizer->removeXMLTag(true);
 }
 
@@ -71,15 +71,23 @@ if ($cachedSVG) {
     return $cachedSVG;
 }
 
-// Maybe it needs to be returned as symbol
-if ($toSymbol) {
-    $svgToSymbol = preg_replace('/\b(?:xmlns).+?(\s|$)/x', '', $cleanSVG);
-    $svgToSymbol = preg_replace('/(?:svg)/x', 'symbol', $svgToSymbol);
-    $cacheManager->set($cacheElementKey, $svgToSymbol, $cacheLifetime, $cacheOptions);
-    return $svgToSymbol;
+// If the SVG is going to be parsed inline, then certain tags and properties
+// will need to be stripped from the output.
+if ($svgInline) {
+    $cleanSVG = preg_replace('/\b(?:xml).+?(\s|$|(?=>))/x', '', $cleanSVG);
 }
 
-// Otherwise, cache the SVG first and then return it
+// Maybe it needs to be returned as symbol
+if ($svgToSymbol) {
+    $cleanSVG = preg_replace('/(?:svg)/x', 'symbol', $cleanSVG);
+    $cleanSVG = preg_replace('/\b(?:height=).+?(\s|$|(?=>))/x', '', $cleanSVG);
+    $cleanSVG = preg_replace('/\b(?:width=).+?(\s|$|(?=>))/x', '', $cleanSVG);
+    $cleanSVG = preg_replace('/\b(?:x=).+?(\s|$|(?=>))/x', '', $cleanSVG);
+    $cleanSVG = preg_replace('/\b(?:y=).+?(\s|$|(?=>))/x', '', $cleanSVG);
+}
+
+
+// Cache the output we have at this point and then return it
 $cacheManager->set($cacheElementKey, $cleanSVG, $cacheLifetime, $cacheOptions);
 
 return $cleanSVG;
