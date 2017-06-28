@@ -11,6 +11,8 @@
 $corePath = $modx->getOption('svgsanitizer.core_path', null, $modx->getOption('core_path') . 'components/svgsanitizer/');
 
 $file = $modx->getOption('file', $scriptProperties, '');
+$title = $modx->getOption('title', $scriptProperties, '');
+$titleID = pathinfo($file, PATHINFO_FILENAME);
 $minify = $modx->getOption('minify', $scriptProperties, 1);
 $removeRemote = $modx->getOption('removeRemote', $scriptProperties, 0);
 
@@ -64,7 +66,7 @@ $cacheOptions = array(
 );
 
 // Check the cache first
-//$cachedSVG = $cacheManager->get($cacheElementKey, $cacheOptions);
+$cachedSVG = $cacheManager->get($cacheElementKey, $cacheOptions);
 
 // If a cached result was found, use that data
 if ($cachedSVG) {
@@ -89,78 +91,22 @@ if ($svgToSymbol) {
 // For better accessibility, we inject a few extra properties into the SVG.
 // Because we all know what happens if we don't... (nothing)
 
-// First, we
-$new = new DOMDocument();
-$new->formatOutput = true;
+// We'll create a new document, based on what we have now
+$output = new DOMDocument();
+$output->loadXML($cleanSVG, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-$new->loadXML("<root><svg aria-labelledby='123'><title id='123'>Test test title</title></svg></root>");
+// For interpretation on screen readers, our SVG needs a title and some aria attributes
+// See this pen for more details: https://codepen.io/NathanPJF/full/GJObGm
+$title = $output->createElement('title', $title);
+$title->setAttribute('id', 'title-' . $titleID);
 
-//echo "The 'new document' before copying nodes into it:\n";
-//echo $new->saveHTML();
+$output->documentElement->appendChild($title);
+$output->documentElement->setAttribute('role', 'img');
+$output->documentElement->setAttribute('aria-labelledby', 'title-' . $titleID);
 
+$cleanSVG = $output->saveHTML();
 
-$source = new DOMDocument();
-$source->loadXML($cleanSVG, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
-$node = $new->getElementsByTagName('title')->item(0);
-
-//echo $source->saveHTML();
-
-// Import the node, and all its children, to the document
-$node = $source->importNode($node, true);
-// And then append it to the "<root>" node
-$source->documentElement->appendChild($node);
-$source->documentElement->setAttribute('id', '123');
-$source->documentElement->setAttribute('role', 'img');
-
-//echo "\nThe 'new document' after copying the nodes into it:\n";
-echo $source->saveHTML();
-
-//$output = new DOMDocument();
-//$output->formatOutput = true;
-//
-//$output->loadXML("<svg><title>Test test title</title></svg>");
-//
-//echo "The 'new document' before copying nodes into it:\n";
-//echo $output->saveHTML();
-//
-//// Import the node, and all its children, to the document
-//$node = $output->importNode($node, true);
-//// And then append it to the "<root>" node
-//$output->documentElement->appendChild($node);
-//
-//echo "\nThe 'new document' after copying the nodes into it:\n";
-//echo $output->saveHTML();
-
-
-//$title = $doc->createElement('title', 'Test');
-//$id = $doc->createAttribute('id');
-
-
-//$doc->createElement('id', '123');
-//$title->setAttribute('id', '123');
-//
-//$doc->appendChild($title);
-//$svg = $doc->saveHTML();
-//
-//$title->setAttribute('id', '123');
-//
-//print_r($svg);
-
-
-// Cache the output we have at this point and then return it
+// Cache the output we just created and then return it
 $cacheManager->set($cacheElementKey, $cleanSVG, $cacheLifetime, $cacheOptions);
 
 return $cleanSVG;
-
-
-//if ($tpl) {
-//    $output = $modx->getChunk($tpl, $addressArray);
-//}
-//
-//$toPlaceholder = $modx->getOption('toPlaceholder', $scriptProperties, false);
-//if (!empty($toPlaceholder)) {
-//    $modx->setPlaceholder($toPlaceholder, $output);
-//    return '';
-//}
-//return $output;
