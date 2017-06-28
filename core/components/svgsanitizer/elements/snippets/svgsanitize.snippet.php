@@ -12,14 +12,19 @@ $corePath = $modx->getOption('svgsanitizer.core_path', null, $modx->getOption('c
 
 $file = $modx->getOption('file', $scriptProperties, '');
 $minify = $modx->getOption('minify', $scriptProperties, 1);
-$removeRemote = $modx->getOption('removeRemoteReferences', $scriptProperties, 0);
+$removeRemote = $modx->getOption('removeRemote', $scriptProperties, 0);
+
+// Option to remove the <?xml> tag from the header
 $stripHeader = $modx->getOption('stripHeader', $scriptProperties, 0);
 
+// Output as SVG symbol instead of stand-alone SVG (for nested use in a parent SVG)
+$toSymbol = $modx->getOption('toSymbol', $scriptProperties, 0);
+
+// Setup svgSanitize
 if (!class_exists('\enshrined\svgSanitize\Sanitizer')) {
     require $corePath . 'vendor/autoload.php';
 }
 
-// Setup svgSanitize
 use enshrined\svgSanitize\Sanitizer;
 
 // Create a new sanitizer instance
@@ -64,6 +69,14 @@ $cachedSVG = $cacheManager->get($cacheElementKey, $cacheOptions);
 // If a cached result was found, use that data
 if ($cachedSVG) {
     return $cachedSVG;
+}
+
+// Maybe it needs to be returned as symbol
+if ($toSymbol) {
+    $svgToSymbol = preg_replace('/\b(?:xmlns).+?(\s|$)/x', '', $cleanSVG);
+    $svgToSymbol = preg_replace('/(?:svg)/x', 'symbol', $svgToSymbol);
+    $cacheManager->set($cacheElementKey, $svgToSymbol, $cacheLifetime, $cacheOptions);
+    return $svgToSymbol;
 }
 
 // Otherwise, cache the SVG first and then return it
