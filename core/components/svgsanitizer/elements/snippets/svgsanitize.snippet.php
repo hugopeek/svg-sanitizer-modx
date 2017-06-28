@@ -64,7 +64,7 @@ $cacheOptions = array(
 );
 
 // Check the cache first
-$cachedSVG = $cacheManager->get($cacheElementKey, $cacheOptions);
+//$cachedSVG = $cacheManager->get($cacheElementKey, $cacheOptions);
 
 // If a cached result was found, use that data
 if ($cachedSVG) {
@@ -79,12 +79,73 @@ if ($svgInline) {
 
 // Maybe it needs to be returned as symbol
 if ($svgToSymbol) {
-    $cleanSVG = preg_replace('/(?:svg)/x', 'symbol', $cleanSVG);
+    $cleanSVG = preg_replace('/\b(?:svg)/x', 'symbol', $cleanSVG);
     $cleanSVG = preg_replace('/\b(?:height=).+?(\s|$|(?=>))/x', '', $cleanSVG);
     $cleanSVG = preg_replace('/\b(?:width=).+?(\s|$|(?=>))/x', '', $cleanSVG);
     $cleanSVG = preg_replace('/\b(?:x=).+?(\s|$|(?=>))/x', '', $cleanSVG);
     $cleanSVG = preg_replace('/\b(?:y=).+?(\s|$|(?=>))/x', '', $cleanSVG);
 }
+
+// For better accessibility, we inject a few extra properties into the SVG.
+// Because we all know what happens if we don't... (nothing)
+
+// First, we
+$new = new DOMDocument();
+$new->formatOutput = true;
+
+$new->loadXML("<root><svg aria-labelledby='123'><title id='123'>Test test title</title></svg></root>");
+
+//echo "The 'new document' before copying nodes into it:\n";
+//echo $new->saveHTML();
+
+
+$source = new DOMDocument();
+$source->loadXML($cleanSVG, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+$node = $new->getElementsByTagName('title')->item(0);
+
+//echo $source->saveHTML();
+
+// Import the node, and all its children, to the document
+$node = $source->importNode($node, true);
+// And then append it to the "<root>" node
+$source->documentElement->appendChild($node);
+$source->documentElement->setAttribute('id', '123');
+$source->documentElement->setAttribute('role', 'img');
+
+//echo "\nThe 'new document' after copying the nodes into it:\n";
+echo $source->saveHTML();
+
+//$output = new DOMDocument();
+//$output->formatOutput = true;
+//
+//$output->loadXML("<svg><title>Test test title</title></svg>");
+//
+//echo "The 'new document' before copying nodes into it:\n";
+//echo $output->saveHTML();
+//
+//// Import the node, and all its children, to the document
+//$node = $output->importNode($node, true);
+//// And then append it to the "<root>" node
+//$output->documentElement->appendChild($node);
+//
+//echo "\nThe 'new document' after copying the nodes into it:\n";
+//echo $output->saveHTML();
+
+
+//$title = $doc->createElement('title', 'Test');
+//$id = $doc->createAttribute('id');
+
+
+//$doc->createElement('id', '123');
+//$title->setAttribute('id', '123');
+//
+//$doc->appendChild($title);
+//$svg = $doc->saveHTML();
+//
+//$title->setAttribute('id', '123');
+//
+//print_r($svg);
 
 
 // Cache the output we have at this point and then return it
