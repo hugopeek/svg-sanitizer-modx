@@ -2,8 +2,10 @@
 /**
  * svgSanitize
  *
+ * A snippet for parsing SVG files inline. The file is cleaned first, to make
+ * sure there's no malicious javascripts or external links inside.
  *
- *
+ * Uses the following sanitizer: https://github.com/darylldoyle/svg-sanitizer/
  *
  * @author Hugo Peek
  */
