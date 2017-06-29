@@ -51,6 +51,7 @@ Include this SVG somewhere in your HTML and then reference the symbols in your c
 ```
 
 Note that you have to prepend the anchor with the full URI. This is because MODX pages use the base element `<base href="https://your-site.com/">`, which confuses the anchor link inside the `<use>` element in some browsers.
+
 Read more about that here: https://stackoverflow.com/questions/18259032/
 
 ## Properties
@@ -79,11 +80,11 @@ Have fun!
 
 Some interesting resources about working with SVG:
 
-https://css-tricks.com/pretty-good-svg-icon-system/
-https://24ways.org/2014/an-overview-of-svg-sprite-creation-techniques/
-https://medium.com/@webprolific/why-and-how-i-m-using-svg-over-fonts-for-icons-7241dab890f0
-https://nucleoapp.com/how-to-create-an-icon-system-using-svg-symbols/
-https://css-tricks.com/svg-use-with-external-reference-take-2/
-https://codepen.io/NathanPJF/full/GJObGm
-https://www.sarasoueidan.com/blog/svgo-tools/
-https://jakearchibald.github.io/svgomg/
+- https://css-tricks.com/pretty-good-svg-icon-system/
+- https://24ways.org/2014/an-overview-of-svg-sprite-creation-techniques/
+- https://medium.com/@webprolific/why-and-how-i-m-using-svg-over-fonts-for-icons-7241dab890f0
+- https://nucleoapp.com/how-to-create-an-icon-system-using-svg-symbols/
+- https://css-tricks.com/svg-use-with-external-reference-take-2/
+- https://codepen.io/NathanPJF/full/GJObGm
+- https://www.sarasoueidan.com/blog/svgo-tools/
+- https://jakearchibald.github.io/svgomg/
