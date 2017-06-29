@@ -1,0 +1,6 @@
+# Changelog for svgSanitizer
+
+## svgSanitizer 1.0.0
+Released on June 29, 2017
+
+Initial release
