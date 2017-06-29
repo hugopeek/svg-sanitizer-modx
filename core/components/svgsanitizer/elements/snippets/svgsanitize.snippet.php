@@ -12,9 +12,10 @@ $corePath = $modx->getOption('svgsanitizer.core_path', null, $modx->getOption('c
 
 $file = $modx->getOption('file', $scriptProperties, '');
 $title = $modx->getOption('title', $scriptProperties, '');
-$titleID = pathinfo($file, PATHINFO_FILENAME);
 $minify = $modx->getOption('minify', $scriptProperties, 1);
+$a11y = $modx->getOption('a11y', $scriptProperties, 1);
 $removeRemote = $modx->getOption('removeRemote', $scriptProperties, 0);
+$cacheExpires = $modx->getOption('cacheExpires', $scriptProperties, 86400*365);
 
 // Indicate if the SVG will be parsed inline or not
 $svgInline = $modx->getOption('inline', $scriptProperties, 1);
@@ -59,7 +60,7 @@ if (!$cleanSVG) {
 $cacheManager = $modx->getCacheManager();
 $cacheKey = 'svgsanitizer';
 $cacheElementKey = 'svg/' . md5(json_encode($file));
-$cacheLifetime = 86400*365;
+$cacheLifetime = $cacheExpires;
 $cacheOptions = array(
     xPDO::OPT_CACHE_KEY => $cacheKey,
     xPDO::OPT_CACHE_EXPIRES => $cacheLifetime,
@@ -90,23 +91,25 @@ if ($svgToSymbol) {
 
 // For better accessibility, we inject a few extra properties into the SVG.
 // Because we all know what happens if we don't... (nothing)
+if ($a11y) {
+    // We'll create a new document, based on the cleaned SVG
+    $output = new DOMDocument();
+    $output->loadXML($cleanSVG, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-// We'll create a new document, based on what we have now
-$output = new DOMDocument();
-$output->loadXML($cleanSVG, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    // For interpretation on screen readers, our SVG needs a title and some aria attributes
+    // See this pen for more details: https://codepen.io/NathanPJF/full/GJObGm
+    $titleID = pathinfo($file, PATHINFO_FILENAME);
+    $titleElement = $output->createElement('title', $title);
+    $titleElement->setAttribute('id', 'title-' . $titleID);
 
-// For interpretation on screen readers, our SVG needs a title and some aria attributes
-// See this pen for more details: https://codepen.io/NathanPJF/full/GJObGm
-$title = $output->createElement('title', $title);
-$title->setAttribute('id', 'title-' . $titleID);
+    $output->documentElement->appendChild($titleElement);
+    $output->documentElement->setAttribute('role', 'img');
+    $output->documentElement->setAttribute('aria-labelledby', 'title-' . $titleID);
 
-$output->documentElement->appendChild($title);
-$output->documentElement->setAttribute('role', 'img');
-$output->documentElement->setAttribute('aria-labelledby', 'title-' . $titleID);
+    $cleanSVG = $output->saveHTML();
+}
 
-$cleanSVG = $output->saveHTML();
-
-// Cache the output we just created and then return it
+// Cache the output we have at this point and then return it
 $cacheManager->set($cacheElementKey, $cleanSVG, $cacheLifetime, $cacheOptions);
 
 return $cleanSVG;
