@@ -60,8 +60,11 @@ For svgSanitize snippet.
 
 Name | Description | Default
 --- | --- | ---
-file | The path to your SVG file, starting from your project root folder. |
+file | The path to your SVG file. Can be absolute, or relative to your project root folder. |
 title | Add a title that describes the content of the SVG graphic. This is important for people using screen readers. |
+classes | Add one or more class names to the SVG tag. Only applies if used inline. |
+stripFill | Remove inline fill colors from file. Enable this if you want to control fill color with CSS, i.e. for icons. | 0
+stripStroke | Remove inline stroke colors from file. Same thing. | 0
 minify | Removes unneeded spaces and line breaks. | 1
 inline | By default, the snippet strips the XML header and some attributes from your SVG file that are not needed for inline display.. But if you are planning to use your SVG as stand-alone file, then you probably want to keep those elements in. | 1
 removeRemote | See: https://github.com/darylldoyle/svg-sanitizer/#remove-remote-references | 0
