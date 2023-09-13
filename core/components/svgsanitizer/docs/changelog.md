@@ -1,5 +1,10 @@
 # Changelog for svgSanitizer
 
+## svgSanitizer 1.2.0
+Released on ...
+
+- Add width and height to SVG based on viewBox
+
 ## svgSanitizer 1.1.0
 Released on February 24, 2023
 

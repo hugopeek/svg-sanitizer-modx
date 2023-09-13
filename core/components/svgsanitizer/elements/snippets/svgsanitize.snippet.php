@@ -119,9 +119,22 @@ if ($stripStroke) {
 }
 
 // Create temporary element, based on the cleaned SVG
-if ($a11y || $classes) {
+if ($a11y || $classes || $svgInline) {
     $output = new DOMDocument();
     $output->loadXML($cleanSVG, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
+    // Add width and height to SVG based on viewBox
+    $width = $output->documentElement->getAttribute('width');
+    $height = $output->documentElement->getAttribute('height');
+    $viewBox = $output->documentElement->getAttribute('viewBox');
+    if (!$width && !$height && $viewBox) {
+        $viewBox = explode(' ', $viewBox);
+        $width = $viewBox[2];
+        $height = $viewBox[3];
+
+        $output->documentElement->setAttribute('width', $width);
+        $output->documentElement->setAttribute('height', $height);
+    }
 }
 
 // Add classes if specified
