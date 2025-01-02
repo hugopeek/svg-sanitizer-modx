@@ -3,6 +3,8 @@
 ## svgSanitizer 1.2.0
 Released on ...
 
+- Require PHP 8
+- Update svg-sanitize to 0.20.0
 - Add width and height to SVG based on viewBox
 
 ## svgSanitizer 1.1.0

@@ -1,5 +1,16 @@
 {
+    "name": "fractalfarming/svgsanitizer",
+    "description": "A MODX wrapper for enshrined/svg-sanitize, an SVG sanitizer for PHP.",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "hugopeek",
+            "email": "hugo@fractal-farming.com"
+        }
+    ],
     "require": {
-        "enshrined/svg-sanitize": "0.15.4"
+        "php": ">=8.0",
+        "enshrined/svg-sanitize": "0.20.0"
     }
 }
