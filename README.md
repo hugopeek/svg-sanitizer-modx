@@ -1,12 +1,13 @@
 # svgSanitizer
 
-A MODX extra for parsing SVG files inline. The file is cleaned first, to make sure there's no malicious javascripts or external links inside.
+A MODX extra to sanitize SVG files and parse them inline, or as part of an SVG sprite. The file is cleaned first to make sure there are no malicious scripts, links or other XSS tricksters inside. After that, you can tweak the output to match any compatibility or design requirements you may have.
 
-Uses the following sanitizer: https://github.com/darylldoyle/svg-sanitizer/
+Many thanks to Daryll Doyle for providing and maintaining the sanitizer:
+https://github.com/darylldoyle/svg-sanitizer/
 
 ## Inline usage
 
-All you need to do to get started, is place your SVGs in a folder somewhere inside your project and reference the file path in the svgSanitize snippet call:
+To get started, place your SVGs in a folder inside your project and reference the file path in the svgSanitize snippet call:
 
 ```
 [[svgSanitize?
@@ -15,12 +16,12 @@ All you need to do to get started, is place your SVGs in a folder somewhere insi
 ]]
 ```
 
-## Create SVG sprite
+## Create an SVG sprite
 
 In addition to cleaning your SVG, you can choose to output the result as a symbol, for use in an SVG sprite:
 
 ```html
-<svg style="display: none;">
+<svg class="hidden">
     [[svgSanitize?
         &file=`assets/img/icons/sanitize-me.svg`
         &title=`Add a title here for improved accessibility`
@@ -33,7 +34,7 @@ In addition to cleaning your SVG, you can choose to output the result as a symbo
 Will result in something like:
 
 ```html
-<svg style="display: none;">
+<svg class="hidden">
     <symbol viewBox="0 0 24 24" id="sanitize-me">
         <title>Yay, you cared about accessibility</title>
         ...
@@ -54,9 +55,55 @@ Note that you have to prepend the anchor with the full URI. This is because MODX
 
 Read more about that here: https://stackoverflow.com/questions/18259032/
 
+## Caching
+
+The sanitized SVGs are cached inside a sub folder of core/cache, based on the cacheKey setting. By default, this will be `svgsanitizer`. But please note:
+
+> [!NOTE]
+> **The default 'svgsanitizer' cache folder is not cleared automatically!**
+
+If you want to clear the SVG cache every time the MODX cache is cleared, you could simply change the cacheKey to 'default'. But I don't recommend this. There's really no need to sanitize each SVG again after a cache clear.
+
+A better option is to install [getCache](https://extras.modx.com/package/getcache) and create a menu button for manually clearing the 'svgsanitizer' partition. Here's an example handler:
+
+```js
+var partition = 'svgsanitizer';
+var topic = '/getcache/cache/partition/refresh/' + partition;
+
+this.console = MODx.load({
+    xtype: 'modx-console',
+    register: 'mgr',
+    topic: topic,
+    show_filename: 0
+});
+
+this.console.show(Ext.getBody());
+
+MODx.Ajax.request({
+    url: MODx.config.assets_url + 'components/getcache/connector.php',
+    params: {
+        action: 'cache/partition/refresh',
+        partitions: partition,
+        register: 'mgr',
+        topic: topic
+    },
+    listeners: {
+        'success': {
+            fn: function () {
+                this.console.fireEvent('complete');
+            }, scope: this
+        }
+    }
+});
+
+return false;
+```
+
+You could place this under the regular Clear Cache button for example. Attach the `empty_cache` permission to grant the same access as for regular cache clearing.
+
 ## Properties
 
-For svgSanitize snippet.
+For the svgSanitize snippet.
 
 Name | Description | Default
 --- | --- | ---
@@ -66,10 +113,11 @@ classes | Add one or more class names to the SVG tag. Only applies if used inlin
 stripFill | Remove inline fill colors from file. Enable this if you want to control fill color with CSS, i.e. for icons. | 0
 stripStroke | Remove inline stroke colors from file. Same thing. | 0
 minify | Removes unneeded spaces and line breaks. | 1
-inline | By default, the snippet strips the XML header and some attributes from your SVG file that are not needed for inline display.. But if you are planning to use your SVG as stand-alone file, then you probably want to keep those elements in. | 1
+inline | By default, the snippet strips the XML header and some attributes from your SVG file that are not needed for inline display. But if you are planning to use your SVG as stand-alone file, then you probably want to keep those elements in. | 1
 removeRemote | See: https://github.com/darylldoyle/svg-sanitizer/#remove-remote-references | 0
+cacheKey | Sanitized SVGs will be cached inside this subfolder of core/cache. | svgsanitizer
 cacheExpires | By default, the generated SVGs are cached for 1 year. You can change this to 1 for example, if you don't want it to cache anything during testing. | 86400*365
-a11y | If accessibility is not important for you, or if you already have that covered inside your SVG, you can disable this feature by setting it to 0. | 1
+a11y | If accessibility is not a requirement, or if you already have that covered inside your SVG, you can disable this feature by setting it to 0. | 1
 
 ## Why
 
