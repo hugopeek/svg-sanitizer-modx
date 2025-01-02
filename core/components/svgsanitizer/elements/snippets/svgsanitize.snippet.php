@@ -31,6 +31,7 @@ $stripStroke = $modx->getOption('stripStroke', $scriptProperties, 0);
 $minify = $modx->getOption('minify', $scriptProperties, 1);
 $a11y = $modx->getOption('a11y', $scriptProperties, 1);
 $removeRemote = $modx->getOption('removeRemote', $scriptProperties, 0);
+$cacheKey = $modx->getOption('cacheKey', $scriptProperties, 'svgsanitizer');
 $cacheExpires = $modx->getOption('cacheExpires', $scriptProperties, 86400*365);
 
 // Indicate if the SVG will be parsed inline or not
@@ -47,12 +48,10 @@ if (!file_exists($file)) {
 
 // Use caching to prevent unnecessary cleaning operations
 $cacheManager = $modx->getCacheManager();
-$cacheKey = 'svgsanitizer';
 $cacheElementKey = 'svg/' . md5(json_encode($file . filesize($file) . $title . $classes));
-$cacheLifetime = $cacheExpires;
 $cacheOptions = array(
     xPDO::OPT_CACHE_KEY => $cacheKey,
-    xPDO::OPT_CACHE_EXPIRES => $cacheLifetime,
+    xPDO::OPT_CACHE_EXPIRES => $cacheExpires,
 );
 
 // If a cached result was found, use that data
@@ -148,7 +147,12 @@ if ($a11y) {
     // For interpretation on screen readers, our SVG needs a title and some aria attributes
     // See this pen for more details: https://codepen.io/NathanPJF/full/GJObGm
     $titleID = pathinfo($file, PATHINFO_FILENAME);
-    $titleElement = $output->createElement('title', $title);
+    try {
+        $titleElement = $output->createElement('title', $title);
+    } catch (DOMException $e) {
+        $modx->log(modX::LOG_LEVEL_ERROR, "[svgSanitize] SVG could not be cleaned: \n" . $e->getMessage());
+        return '';
+    }
 
     $output->documentElement->setAttribute('role', 'img');
     $output->documentElement->setAttribute('aria-label', $titleID);

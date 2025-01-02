@@ -1,16 +1,16 @@
 {
     "name": "svgSanitizer",
     "lowCaseName": "svgsanitizer",
-    "description": "Parse SVG files inline. The file is cleaned first, to make sure there's no malicious scripts or external links inside. Uses the following sanitizer: https://github.com/darylldoyle/svg-sanitizer/",
+    "description": "Sanitize SVG files and parse them inline. Wrapper for enshrined/svg-sanitize.",
     "author": "Hugo Peek",
-    "version": "1.1.0",
+    "version": "1.2.0",
 
     "package": {
         "elements": {
             "snippets": [
                 {
                     "name": "svgSanitize",
-                    "description": "Cleans a single SVG file and returns the output inline."
+                    "description": "Clean a single SVG file and return the output inline."
                 }
             ],
 
