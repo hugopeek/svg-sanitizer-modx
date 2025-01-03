@@ -1,7 +1,7 @@
 # Changelog for svgSanitizer
 
 ## svgSanitizer 1.2.0
-Released on ...
+Released on January 3, 2025
 
 - Require PHP 8
 - Update svg-sanitize to 0.20.0
