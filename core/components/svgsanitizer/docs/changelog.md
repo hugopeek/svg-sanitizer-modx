@@ -6,7 +6,7 @@ Released on ...
 - Require PHP 8
 - Update svg-sanitize to 0.20.0
 - Clarify caching behaviour in readme
-- Add option to change the cacheKey
+- Add system settings for changing cache key and expiry
 - Add width and height to SVG based on viewBox
 
 ## svgSanitizer 1.1.0

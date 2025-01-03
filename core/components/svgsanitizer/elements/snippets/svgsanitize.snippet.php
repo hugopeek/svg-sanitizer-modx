@@ -31,8 +31,8 @@ $stripStroke = $modx->getOption('stripStroke', $scriptProperties, 0);
 $minify = $modx->getOption('minify', $scriptProperties, 1);
 $a11y = $modx->getOption('a11y', $scriptProperties, 1);
 $removeRemote = $modx->getOption('removeRemote', $scriptProperties, 0);
-$cacheKey = $modx->getOption('cacheKey', $scriptProperties, 'svgsanitizer');
-$cacheExpires = $modx->getOption('cacheExpires', $scriptProperties, 86400*365);
+$cacheKey = $modx->getOption('svgsanitizer.cache_key', $scriptProperties, 'svgsanitizer');
+$cacheExpires = $modx->getOption('svgsanitizer.cache_expires', $scriptProperties, 86400*365);
 
 // Indicate if the SVG will be parsed inline or not
 $svgInline = $modx->getOption('inline', $scriptProperties, 1);
@@ -162,7 +162,7 @@ if ($a11y) {
 }
 
 // Cache the output we have at this point
-$cacheManager->set($cacheElementKey, $cleanSVG, $cacheLifetime, $cacheOptions);
+$cacheManager->set($cacheElementKey, $cleanSVG, $cacheExpires, $cacheOptions);
 
 // Return SVG
 return $cleanSVG;

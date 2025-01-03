@@ -17,7 +17,17 @@
             "categories": []
         },
 
-        "systemSettings": []
+        "systemSettings": [
+            {
+                "key": "cache_key",
+                "area": "caching",
+                "value": "svgsanitizer"
+            },{
+                "key": "cache_expires",
+                "area": "caching",
+                "value": "86400*365"
+            }
+        ]
     },
 
     "build": {
