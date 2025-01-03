@@ -10,11 +10,45 @@
             "snippets": [
                 {
                     "name": "svgSanitize",
-                    "description": "Clean a single SVG file and return the output inline."
+                    "description": "Clean a single SVG file and return the output inline.",
+                    "properties": [
+                        {
+                            "name": "file",
+                            "value": ""
+                        },{
+                            "name": "title",
+                            "value": ""
+                        },{
+                            "name": "class",
+                            "value": ""
+                        },{
+                            "name": "stripFill",
+                            "type": "combo-boolean",
+                            "value": "0"
+                        },{
+                            "name": "stripStroke",
+                            "type": "combo-boolean",
+                            "value": "0"
+                        },{
+                            "name": "minify",
+                            "type": "combo-boolean",
+                            "value": "1"
+                        },{
+                            "name": "inline",
+                            "type": "combo-boolean",
+                            "value": "1"
+                        },{
+                            "name": "removeRemote",
+                            "type": "combo-boolean",
+                            "value": "0"
+                        },{
+                            "name": "a11y",
+                            "type": "combo-boolean",
+                            "value": "1"
+                        }
+                    ]
                 }
-            ],
-
-            "categories": []
+            ]
         },
 
         "systemSettings": [
